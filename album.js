@@ -1,46 +1,57 @@
-const queryParams = document.location.search;
-const urlParams = new URLSearchParams(queryParams);
-const albumId = urlParams.get('album_id');
+import renderHeader from "./header.js";
 
-const albumWrapper = document.querySelector('#album-wrapper');
+function init() {
+  const queryParams = document.location.search;
+  const urlParams = new URLSearchParams(queryParams);
+  const albumId = urlParams.get('album_id');
+  
+  const albumWrapper = document.querySelector('#album-wrapper');
+  
+  if (albumId) {
+    renderAlbumsList(albumId, albumWrapper);
+  } else {
+    renderErrorMessage(albumWrapper);
+  }
 
-if (albumId) {
-  fetch(`https://jsonplaceholder.typicode.com/albums/${albumId}?_embed=photos&_expand=user`)
-    .then(res => res.json())
-    .then(album => {
-      if (!album.id) {
-        renderErrorMessage(albumWrapper);
-        return;
-      }
+  renderHeader();
+}
 
-      let { title, user, photos } = album;
+async function renderAlbumsList(albumId, albumWrapper) {
+  const res = await fetch(`https://jsonplaceholder.typicode.com/albums/${albumId}?_embed=photos&_expand=user`);
+  const album = await res.json();
 
-      const albumTitle = document.createElement('h1');
-      albumTitle.classList.add('album-title', 'page-title');
-      albumTitle.textContent = title;
+  if (!album.id) {
+    renderErrorMessage(albumWrapper);
+    return;
+  }
 
-      const albumAuthor = document.createElement('span');
-      albumAuthor.classList.add('album-author');
-      albumAuthor.innerHTML = `<strong>Album author:</strong> <a href="./user.html?user_id=${user.id}">${user.name}</a>`;
+  let { title, user, photos } = album;
 
-      const photosList = document.createElement('div');
-      photosList.classList.add('photos-list');
+  const albumTitle = document.createElement('h1');
+  albumTitle.classList.add('album-title', 'page-title');
+  albumTitle.textContent = title;
 
-      albumWrapper.append(albumTitle, albumAuthor, photosList);
+  const albumAuthor = document.createElement('span');
+  albumAuthor.classList.add('album-author');
+  albumAuthor.innerHTML = `<strong>Album author:</strong> <a href="./user.html?user_id=${user.id}">${user.name}</a>`;
 
-      photos.map(photo => {
-        const photoItem = document.createElement('img');
-        photoItem.src = photo.thumbnailUrl;
-        photoItem.alt = photo.title;
+  const photosList = document.createElement('div');
+  photosList.classList.add('photos-list');
 
-        photosList.append(photoItem);
-      })
-    })
-} else {
-  renderErrorMessage(albumWrapper);
+  albumWrapper.append(albumTitle, albumAuthor, photosList);
+
+  photos.map(photo => {
+    const photoItem = document.createElement('img');
+    photoItem.src = photo.thumbnailUrl;
+    photoItem.alt = photo.title;
+
+    photosList.append(photoItem);
+  })
 }
 
 function renderErrorMessage(parentElement) {
   parentElement.innerHTML = `<h1>Something went wrong... Album not found.</h1>
                              <a href="./index.html">Back to home page</a>`;
 }
+
+init();
