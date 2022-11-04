@@ -10,7 +10,7 @@ export function firstLetterUpperCase(text) {
   }
   
   export function createLinksList(paramsObj) {
-    let { wrapper, data, path, listClasses, itemClasses } = paramsObj;
+    let { data, path, listClasses, itemClasses } = paramsObj;
   
     const list = document.createElement('ul');
     list.classList.add('list-element');
@@ -20,8 +20,6 @@ export function firstLetterUpperCase(text) {
         list.classList.add(elementClass);
       })
     }
-  
-    wrapper.append(list);
   
     data.map(item => {
       const itemElement = document.createElement('li');
@@ -40,4 +38,6 @@ export function firstLetterUpperCase(text) {
       itemElement.append(linkElement);
       list.append(itemElement);
     })
+  
+    return list;
   }
